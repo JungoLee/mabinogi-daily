@@ -14,16 +14,24 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
+
+// Configure allowed origins
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:5174',
+].filter((origin): origin is string => !!origin && origin.startsWith('http'));
+
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: allowedOrigins.length > 0 ? allowedOrigins : 'http://localhost:5173',
     credentials: true,
   },
 });
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: allowedOrigins.length > 0 ? allowedOrigins : 'http://localhost:5173',
   credentials: true,
 }));
 app.use(express.json());
